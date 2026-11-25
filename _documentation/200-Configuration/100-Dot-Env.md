@@ -380,6 +380,23 @@ For enhanced security, HAWKI utilizes individual salts for each component to ens
 | Variable         | Description                                |
 |------------------|--------------------------------------------|
 | IMPRINT_LOCATION | The URL to your organization imprint page. |
+| PRIVACY_POLICY_URL | The URL to your privacy policy. Defaults to the built-in `/dataprotection` page. |
+| TERMS_OF_USE_URL | The URL to your terms of use. |
+
+Each link is shown on the sign-in page and in the account menu; an empty value hides it. A value is an absolute `http(s)` URL or a path on this host starting with `/`.
+
+## Branding
+
+| Variable | Description |
+|----------|-------------|
+| BRAND_ACCENT_COLOR | Brand color as `#RRGGBB`. Its hue and saturation re-color the accent surfaces (buttons, links, selections, focus rings). The lightness steps of the interface stay fixed, so contrast is preserved in light and dark mode. Empty = HAWKI blue (`#1139d7`). |
+| BRAND_COLOR_SUCCESS, BRAND_COLOR_WARNING, BRAND_COLOR_ERROR, BRAND_COLOR_INFO | Status colors for confirmations, warnings, errors and notes, as CSS OKLCH values: `oklch(<lightness 0–100>% <chroma 0–0.4> <hue 0–360>)`. Used exactly as given. Empty = the built-in colors (`oklch(50% 0.17 145)`, `oklch(62% 0.17 75)`, `oklch(52% 0.21 25)`, `oklch(55% 0.14 230)`). |
+| BRAND_CORNER_STYLE | Corner rounding of the interface: `round` (default), `soft` or `square`. |
+| BRAND_LOGO_HEIGHT | Height of the logo in the sidebar, in pixels (`12`–`36`). Empty = the logo's own size: 14 px for the HAWKI wordmark, 28 px for an uploaded logo. The sign-in page shows it proportionally larger. |
+| BRAND_ORGANIZATION_NAME | Operating institution, credited on the sign-in page. |
+| BRAND_ORGANIZATION_URL | Website of the operating institution. |
+
+These values, `APP_NAME` and the legal links can also be changed at runtime in the administration (Settings > Branding and Settings > Legal). The logo and the browser tab icon (SVG), the interface font (WOFF2, WOFF, TTF or OTF) and the sign-in backgrounds (images or videos; by default the videos listed in `public/bg_videos/bg_videos.json`) are uploaded there and have no `.env` setting.
 
 ## Runtime overrides in Administration
 

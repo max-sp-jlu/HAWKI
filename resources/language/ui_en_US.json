@@ -7,7 +7,6 @@
         },
         "loading": "Loading…",
         "auth": {
-            "logoLabel": "HAWKI",
             "errors": {
                 "auth_redirect_required": "Start sign-in through your identity provider.",
                 "registration_policy_unavailable": "Registration is temporarily unavailable because the policy could not be loaded. Please try again later.",
@@ -19,8 +18,8 @@
             },
             "login": {
                 "title": "Sign in",
-                "description": "Use your HAWKI account to continue.",
-                "mixedDescription": "Sign in with a local HAWKI account or your organization's sign-in service.",
+                "description": "Use your :appName account to continue.",
+                "mixedDescription": "Sign in with a local :appName account or your organization's sign-in service.",
                 "account": "Account",
                 "password": "Password",
                 "submit": "Sign in",
@@ -61,9 +60,10 @@
                 "backupTitle": "Save your backup code",
                 "welcome": {
                     "back": "Back",
+                    "next": "Next",
                     "progress": "Step :current of :total",
                     "encryption": {
-                        "title": "Welcome to HAWKI",
+                        "title": "Welcome to :appName",
                         "body": "From now on your chats are saved, so you can return to them at any time and from any device. Everything you write is encrypted before it leaves your browser. Nobody, not even your university, can read your conversations.",
                         "action": "Got it"
                     },
@@ -111,11 +111,10 @@
                 "confirmDescription": "This permanently deletes your chats, encrypted keychain, passkey backup, and related profile data. You will then set up a new passkey and backup code. This cannot be undone.",
                 "confirm": "Reset profile"
             },
-            "claim": "Your conversations are encrypted. The key stays with you.",
             "signedInAs": "Signed in as :name",
-            "videoCredit": "Video by :name",
-            "videoToggle": "Video",
-            "videoToggleHint": "Switch the background video off to save energy on low-power devices.",
+            "news": {
+                "title": "News"
+            },
             "preferences": {
                 "switchToDark": "Switch to dark theme",
                 "switchToLight": "Switch to light theme"
@@ -181,6 +180,13 @@
                 "toggleLabel": "Toggle item"
             }
         },
+        "legal": {
+            "label": "Legal information",
+            "imprint": "Imprint",
+            "privacy": "Privacy policy",
+            "terms": "Terms of use",
+            "operatedBy": "A service of :name"
+        },
         "profile": {
             "fallbackName": "Profile",
             "menuTitle": "Account menu",
@@ -195,7 +201,7 @@
             "confirm": "Confirm",
             "decline": "Decline",
             "logoutWarningTitle": "Decline and log out?",
-            "logoutWarningDescription": "You need to accept this announcement to keep using HAWKI. If you decline, you will be logged out.",
+            "logoutWarningDescription": "You need to accept this announcement to keep using :appName. If you decline, you will be logged out.",
             "pageTitle": "Announcements",
             "empty": "There are no announcements for you yet.",
             "back": "Back"
@@ -334,6 +340,9 @@
             "tier": "Tier :number",
             "add_tier": "Add tier",
             "labels": {
+                "round": "Round",
+                "soft": "Soft",
+                "square": "Square",
                 "temperature": "Temperature",
                 "top_p": "Top P",
                 "max_tokens": "Maximum output tokens",
@@ -478,6 +487,8 @@
         "reset_done": "Override removed. The environment value applies to new requests.",
         "settings_tabs": {
             "system": "System",
+            "branding": "Branding",
+            "legal": "Legal",
             "authentication": "Authentication",
             "features": "Features",
             "performance": "Performance"
@@ -487,16 +498,40 @@
         "settings_reset": "Reset to environment: :name",
         "settings_groups": {
             "base": {
-                "title": "Base settings",
-                "description": "Application name and branding."
+                "title": "Naming",
+                "description": "What the application, its AI assistant and the operating institution are called. The institution is credited on the sign-in page."
+            },
+            "theme": {
+                "title": "Appearance",
+                "description": "Brand color and corner rounding. Buttons, links, selections and focus rings take the hue and saturation of the brand color; its lightness is set by the interface, so text stays readable in light and dark mode."
+            },
+            "status": {
+                "title": "Status colors",
+                "description": "Colors for confirmations, warnings, errors and notes, as OKLCH values: oklch(lightness % chroma hue), for example oklch(52% 0.21 25). The value is used exactly as entered, so check that text in this color stays readable on light and dark backgrounds. The dot shows the color."
+            },
+            "font": {
+                "title": "Font",
+                "description": "Font files for the whole interface, one per weight: WOFF2, WOFF, TTF or OTF, up to 5 MB each. WOFF2 loads fastest. The interface uses three weights: 400 for text, 500 for labels and headings, 600 for bold text in answers and tables. A variable font in the regular field provides every weight on its own. Otherwise upload the regular cut first; a weight without a file uses the nearest one, and semibold is thickened by the browser if no file for it exists. Italic cuts are optional and used for emphasis in answers; without them the browser slants the upright font. A variable font in the italic field provides every italic weight. Only upload fonts your institution is licensed to use on the web."
+            },
+            "login": {
+                "title": "Sign-in page",
+                "description": "What the large area next to the sign-in form shows. Each visit shows the next background, in light and dark mode alike; without any, only the logo is shown. Until you change the list, it holds the HAWKI videos. Images: JPEG, PNG, WebP or AVIF; videos: MP4 or WebM; up to 50 MB each. Videos play muted in a loop. Only upload material your institution may publish. Optionally, a small card on top of it lists your three newest news entries."
+            },
+            "onboarding": {
+                "title": "Onboarding",
+                "description": "The welcome steps new users see after their first sign-in. Edit, reorder or remove the HAWKI steps and add your own, for example house rules or where to find help. What you write is shown as written, in one language; a HAWKI step's empty fields keep their translated default."
+            },
+            "logo": {
+                "title": "Logo",
+                "description": "SVG files shown instead of the HAWKI wordmark and as the browser tab icon. The logo is drawn in the brand color, in light and dark mode alike; only its shape is used, not its own colors. Files must be static drawings of up to 256 KB: no scripts, external references or live text, so convert text to outlines before exporting."
             },
             "system": {
                 "title": "System settings",
                 "description": "Base URL, environment, timezone and default language."
             },
             "links": {
-                "title": "Links",
-                "description": "Public accessibility statement. Leave empty to hide the link."
+                "title": "Legal pages",
+                "description": "Shown on the sign-in page and in the account menu. Enter an address, or a path on this server such as /dataprotection. Leave a link empty to hide it."
             },
             "passkey": {
                 "title": "Passkey settings",
@@ -512,7 +547,7 @@
             },
             "features": {
                 "title": "AI features",
-                "description": "AI mention handle and tool availability checks."
+                "description": "Tool availability checks."
             },
             "api": {
                 "title": "API configuration",
@@ -533,6 +568,29 @@
         },
         "settings_labels": {
             "APP_NAME": "Application name",
+            "BRAND_ORGANIZATION_NAME": "Institution name",
+            "BRAND_ORGANIZATION_URL": "Institution website",
+            "BRAND_ACCENT_COLOR": "Brand color",
+            "BRAND_COLOR_SUCCESS": "Success",
+            "BRAND_COLOR_WARNING": "Warning",
+            "BRAND_COLOR_ERROR": "Error",
+            "BRAND_COLOR_INFO": "Information",
+            "BRAND_CORNER_STYLE": "Corner rounding",
+            "BRAND_FONT": "Font – regular (400)",
+            "BRAND_FONT_500": "Medium (500)",
+            "BRAND_FONT_600": "Semibold (600)",
+            "BRAND_FONT_ITALIC": "Italic (400)",
+            "BRAND_FONT_500_ITALIC": "Medium italic (500)",
+            "BRAND_FONT_600_ITALIC": "Semibold italic (600)",
+            "BRAND_ONBOARDING": "Welcome steps",
+            "BRAND_LOGIN_NEWS": "News",
+            "BRAND_LOGIN_BACKGROUNDS": "Backgrounds",
+            "BRAND_LOGO": "Logo",
+            "BRAND_LOGO_HEIGHT": "Logo height",
+            "BRAND_FAVICON": "Browser tab icon",
+            "LEGAL_IMPRINT_URL": "Imprint",
+            "LEGAL_PRIVACY_URL": "Privacy policy",
+            "LEGAL_TERMS_URL": "Terms of use",
             "APP_URL": "Base URL",
             "APP_ENV": "Environment",
             "APP_TIMEZONE": "Default timezone",
@@ -542,7 +600,7 @@
             "SESSION_EXPIRE_ON_CLOSE": "Expire session when the browser closes",
             "SESSION_ENCRYPT": "Encrypt session data",
             "AI_MENTION_HANDLE": "AI mention handle, without @",
-            "ACCESSIBILITY_STATEMENT_URL": "Accessibility statement URL",
+            "ACCESSIBILITY_STATEMENT_URL": "Accessibility statement",
             "APP_SECURITY_PASSKEY_ALLOW_PASTE": "Allow pasting the passkey",
             "APP_SECURITY_PASSKEY_AUTO_GENERATE": "Generate passkeys automatically",
             "APP_SECURITY_PASSKEY_CHAR_LIMITATION": "Restrict passkey characters",
@@ -559,7 +617,13 @@
             "REMOVE_FILES_AFTER_MONTHS": "File retention in months",
             "CHECK_TOOL_STATUS": "Check tool availability"
         },
-        "settings_hint": "Environment values are the defaults. Only changed values are stored. Reload the app after saving.",
+        "settings_hint": "Environment values are the defaults; only changed values are stored. Brand color, corner rounding and logo preview right here while you edit. Some other changes only show after reloading the app.",
+        "settings_unsaved": "Unsaved changes: :count",
+        "settings_upload_svg": "Upload SVG",
+        "settings_replace_svg": "Replace",
+        "settings_pixels": ":value px",
+        "settings_pick_color": "Pick a color",
+        "settings_use_default": "Use default",
         "environment_hint": "Read-only deployment information. Secret values are masked.",
         "action_confirmation": "Run this action? Existing configuration or system state may change.",
         "action_done": "Action completed. Queued tasks run when a worker is available.",
@@ -781,6 +845,54 @@
             "database": "Database override",
             "environment": "Environment / default",
             "deployment": "Deployment"
+        },
+        "onboarding": {
+            "entry": "Step :number",
+            "builtin": "HAWKI step: empty fields show the translated default",
+            "emoji": "Emoji",
+            "title": "Title",
+            "text": "Text",
+            "action": "Button label (optional, default “Next”)",
+            "up": "Move up",
+            "down": "Move down",
+            "remove": "Remove",
+            "add": "Add step",
+            "empty": "No welcome steps: new users go straight to setting up their passkey.",
+            "passkey_last": "The passkey setup always follows as the last step.",
+            "invalid": "Check the welcome steps: each of your own needs a title of up to 80 and a text of up to 600 characters; each HAWKI step may appear once."
+        },
+        "news": {
+            "entry": "News :number",
+            "date": "Date",
+            "title": "Title",
+            "text": "Short text (optional)",
+            "remove": "Remove",
+            "add": "Add news",
+            "empty": "No news: the sign-in page shows none.",
+            "invalid": "Check the news: each needs a date and a title of up to 80 characters; a text may have up to 280 characters."
+        },
+        "media": {
+            "invalid": "Use a JPEG, PNG, WebP or AVIF image or an MP4 or WebM video of up to 50 MB.",
+            "upload_failed": "The file could not be uploaded. Use an image or video of up to 50 MB and try again.",
+            "invalid_entry": "Check the backgrounds: each needs an existing file, and, if given, a credit of up to 100 characters and an https link.",
+            "entry": "Background :number",
+            "credit": "Credit, e.g. the photographer",
+            "link": "Credit link (https://…)",
+            "remove": "Remove",
+            "add": "Add image or video",
+            "empty": "No backgrounds: the sign-in page shows only the logo."
+        },
+        "fonts": {
+            "invalid": "Use a WOFF2, WOFF, TTF or OTF font file of up to 5 MB.",
+            "upload_failed": "The font could not be uploaded. Use a WOFF2, WOFF, TTF or OTF file of up to 5 MB and try again.",
+            "upload": "Upload font",
+            "replace": "Replace",
+            "sample": "The quick brown fox 0123456789",
+            "needs_regular": "Upload the regular font (400) first.",
+            "needs_italic": "Upload the italic font (400) first.",
+            "covered_italic": "Provided by the variable italic font.",
+            "covered": "Provided by the variable regular font.",
+            "variable": "Variable font: provides every weight"
         },
         "icons": {
             "light": "Light",

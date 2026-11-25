@@ -79,6 +79,56 @@ const HawkiCoreSchema = z.object({
     accessibility: z.object({
         statementUrl: z.string().nullable()
     }).optional(),
+    /**
+     * Naming and logo of the deployment. `logoUrl` (a `data:` URI of the
+     * uploaded SVG) replaces the HAWKI wordmark and is tinted
+     * with the accent color like it; the organization
+     * is credited on the sign-in page. Colors are not part of it — the server
+     * applies them to the design tokens while rendering the page.
+     */
+    branding: z.object({
+        appName: z.string(),
+        logoUrl: z.string().nullable(),
+        /** Backgrounds of the sign-in page, shown in turn. Empty: the page shows only the logo. */
+        loginBackgrounds: z.array(z.object({
+            url: z.string(),
+            kind: z.enum(['image', 'video']),
+            credit: z.string().nullable(),
+            link: z.string().nullable()
+        })).optional(),
+        /** News on the sign-in page, newest first; empty to show none. */
+        loginNews: z.array(z.object({
+            date: z.string(),
+            title: z.string(),
+            text: z.string().nullable()
+        })).optional(),
+        /** Welcome steps after the first sign-in, before the passkey step; see `welcomeSteps.ts`. */
+        onboarding: z.array(z.discriminatedUnion('type', [
+            z.object({
+                type: z.literal('builtin'),
+                step: z.enum(['encryption', 'groups']),
+                emoji: z.string().nullable().optional(),
+                title: z.string().nullable().optional(),
+                text: z.string().nullable().optional(),
+                action: z.string().nullable().optional()
+            }),
+            z.object({
+                type: z.literal('custom'),
+                emoji: z.string().nullable(),
+                title: z.string(),
+                text: z.string(),
+                action: z.string().nullable()
+            })
+        ])).optional(),
+        organizationName: z.string().nullable(),
+        organizationUrl: z.string().nullable()
+    }).optional(),
+    /** The operator's legal pages; a null link is not rendered. */
+    legal: z.object({
+        imprintUrl: z.string().nullable(),
+        privacyUrl: z.string().nullable(),
+        termsUrl: z.string().nullable()
+    }).optional(),
     security: z.object({
         /** Generate a random passkey during registration and show only its backup code. */
         passkeyAutoGenerate: z.boolean().default(false),

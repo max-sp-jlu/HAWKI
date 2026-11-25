@@ -31,6 +31,75 @@ return [
         'statement_url' => env('ACCESSIBILITY_STATEMENT_URL'),
     ],
 
+    'branding' => [
+        // Brand color as #RRGGBB. Its hue and saturation drive the accent color ramp. The default is
+        // the HAWKI blue the built-in ramp is made of (oklch 45% 0.24 265), so it changes nothing.
+        'accent_color' => env('BRAND_ACCENT_COLOR') ?: '#1139d7',
+        // Status colors for confirmations, warnings, errors and notes, as CSS OKLCH values:
+        // oklch(<lightness 0-100>% <chroma 0-0.4> <hue 0-360>). The defaults are the built-in colors.
+        'status_colors' => [
+            'success' => env('BRAND_COLOR_SUCCESS') ?: 'oklch(50% 0.17 145)',
+            'warning' => env('BRAND_COLOR_WARNING') ?: 'oklch(62% 0.17 75)',
+            'error' => env('BRAND_COLOR_ERROR') ?: 'oklch(52% 0.21 25)',
+            'info' => env('BRAND_COLOR_INFO') ?: 'oklch(55% 0.14 230)',
+        ],
+        // Corner rounding of the interface: round (default), soft or square.
+        'corner_style' => env('BRAND_CORNER_STYLE', 'round'),
+        // SVG markup of the logo and the browser tab icon. Uploaded in the
+        // administration (Settings > Branding), which validates the files; there is no .env equivalent.
+        'logo' => null,
+        'favicon' => null,
+        // Font files of the interface, one per weight, uploaded in the administration (Settings >
+        // Branding). There is no .env equivalent. The interface uses 400 for text, 500 for labels and
+        // headings and 600 for bold text. A variable font in `font` provides every weight; otherwise a
+        // missing weight falls back to the nearest one.
+        'font' => null,
+        'font_500' => null,
+        'font_600' => null,
+        // Optional italic cuts of the same weights, for emphasis in answers; without them the browser
+        // slants the upright font. A variable font in `font_italic` provides every italic weight.
+        'font_italic' => null,
+        'font_500_italic' => null,
+        'font_600_italic' => null,
+        // Backgrounds of the sign-in page, shown in turn: images or videos, in light and dark mode alike. Edited in the administration (Settings > Branding); until then the videos listed
+        // in public/bg_videos/bg_videos.json. An empty list shows only the logo.
+        'login_backgrounds' => (static function (): array {
+            try {
+                $index = json_decode((string) @file_get_contents(public_path('bg_videos/bg_videos.json')), true, 8, JSON_THROW_ON_ERROR);
+            } catch (\Throwable) {
+                return [];
+            }
+            $entries = [];
+            // The built-in index lists videos per color mode; all of them take turns now.
+            foreach (['lightmode', 'darkmode'] as $list) {
+                foreach (is_array($index[$list] ?? null) ? $index[$list] : [] as $entry) {
+                    $entries[] = ['source' => 'builtin', 'file' => $entry['file'] ?? null,
+                        'credit' => $entry['creator'] ?? null, 'link' => $entry['link'] ?? null];
+                }
+            }
+            return $entries;
+        })(),
+        // News shown on the sign-in page, newest first: entries with a date, a title and an optional
+        // text, edited in the administration. Empty = no news.
+        'login_news' => [],
+        // Welcome steps after the first sign-in, before the passkey setup: built-in steps of HAWKI and
+        // steps written in the administration. The passkey step always follows.
+        'onboarding' => [['type' => 'builtin', 'step' => 'encryption'], ['type' => 'builtin', 'step' => 'groups']],
+        // Height of the logo in the sidebar, in pixels (12-36). The sign-in page scales with it.
+        // Empty = the logo's own size: 14 px for the HAWKI wordmark, 28 px for an uploaded logo.
+        'logo_height' => env('BRAND_LOGO_HEIGHT') ? (int) env('BRAND_LOGO_HEIGHT') : null,
+        // Operating institution, shown on the sign-in page. Empty = not shown.
+        'organization_name' => env('BRAND_ORGANIZATION_NAME'),
+        'organization_url' => env('BRAND_ORGANIZATION_URL'),
+    ],
+
+    'legal' => [
+        // Legal links shown on the sign-in page and in the profile menu. Empty = no link in the UI.
+        'imprint_url' => env('IMPRINT_LOCATION'),
+        'privacy_url' => env('PRIVACY_POLICY_URL', '/dataprotection'),
+        'terms_url' => env('TERMS_OF_USE_URL'),
+    ],
+
     'security' => [
         'passkey' => [
             'auto_generate' => filter_var(env('APP_SECURITY_PASSKEY_AUTO_GENERATE', false), FILTER_VALIDATE_BOOLEAN),

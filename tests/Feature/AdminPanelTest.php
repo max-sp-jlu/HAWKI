@@ -20,6 +20,7 @@ use App\Utils\JobMetrics;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use Tests\TestCase;
 
@@ -212,10 +213,26 @@ class AdminPanelTest extends TestCase
     {
         $user = User::factory()->create();
 
+        // A font setting names a stored file, so one has to exist.
+        Storage::fake(config('filesystems.avatar_storage'));
+        $font = str_repeat('a', 64) . '.woff2';
+        Storage::disk(config('filesystems.avatar_storage'))->put('branding/fonts/' . $font, 'wOF2');
+        $media = str_repeat('a', 64) . '.jpg';
+        Storage::disk(config('filesystems.avatar_storage'))->put('branding/media/' . $media, "\xFF\xD8\xFF");
+
         foreach (SystemSettings::DEFINITIONS as $key => [$path, $type]) {
             $value = match ($key) {
+                'BRAND_FONT', 'BRAND_FONT_500', 'BRAND_FONT_600', 'BRAND_FONT_ITALIC', 'BRAND_FONT_500_ITALIC', 'BRAND_FONT_600_ITALIC' => $font,
+                'BRAND_ONBOARDING' => [['type' => 'builtin', 'step' => 'groups', 'emoji' => null, 'title' => 'Groups', 'text' => null, 'action' => null], ['type' => 'custom', 'emoji' => null, 'title' => 'Rules', 'text' => 'Be kind.', 'action' => null]],
+                'BRAND_LOGIN_NEWS' => [['date' => '2026-10-14', 'title' => 'Release', 'text' => null]],
+                'BRAND_LOGIN_BACKGROUNDS' => [['source' => 'upload', 'file' => $media, 'credit' => null, 'link' => null]],
                 'APP_NAME' => 'Test application', 'APP_ENV' => 'testing', 'APP_TIMEZONE' => 'Europe/Berlin',
                 'APP_LOCALE' => 'de_DE', 'AUTHENTICATION_METHOD' => 'LDAP',
+                'BRAND_ACCENT_COLOR' => '#a00020',
+                'BRAND_COLOR_SUCCESS', 'BRAND_COLOR_WARNING', 'BRAND_COLOR_ERROR', 'BRAND_COLOR_INFO' => 'oklch(40% 0.2 300)',
+                'BRAND_CORNER_STYLE' => 'soft',
+                'BRAND_LOGO_HEIGHT' => 32,
+                'BRAND_LOGO', 'BRAND_FAVICON' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><path d="M0 0h1v1z"/></svg>',
                 default => match ($type) {
                     'boolean' => false, 'number' => 60, 'json' => ['image/png'], default => 'AI_MENTION_HANDLE' === $key ? 'helper' : 'https://example.com/accessibility',
                 },

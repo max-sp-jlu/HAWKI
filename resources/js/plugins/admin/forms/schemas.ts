@@ -1,6 +1,7 @@
 import z from 'zod';
 import type { AdminField, AdminRow } from '../schemas/admin-content.js';
 import type { WorkspaceId } from '../workspaces.js';
+import { isFontFile, oklch } from '../brandTheme.js';
 
 /** Workspaces that have an editor; `tools` is edited on the MCP page and has no route of its own. */
 export type EditorSection = WorkspaceId | 'tools' | (string & {});
@@ -8,6 +9,17 @@ export type EditorSection = WorkspaceId | 'tools' | (string & {});
 const text = (max = 255) => z.string().trim().min(1).max(max);
 const optionalText = (max = 255) => z.string().max(max).nullish();
 const url = z.union([z.literal(''), z.url({ protocol: /^https?$/ }).max(2000)]).nullish();
+const font = z.union([z.literal(''), z.string().refine(isFontFile)]).nullish();
+const oklchColor = z
+    .union([z.literal(''), z.string().refine((value) => oklch(value) !== null)])
+    .nullish();
+const color = z.union([z.literal(''), z.string().regex(/^#[0-9a-fA-F]{6}$/)]).nullish();
+/** Markup of an uploaded SVG file; the server validates the drawing itself (`ProviderIconService::validateSvg`). */
+const svg = z.string().max(262144).nullish();
+/** An absolute HTTP(S) URL or a path on this host, as `SystemSettings::LINK` accepts it. */
+const link = z
+    .union([z.literal(''), z.string().max(2000).regex(/^(?:https?:\/)?\/[^/\s"'<>][^\s"'<>]*$/)])
+    .nullish();
 const date = z
     .string()
     .refine((value) => !value || Number.isFinite(Date.parse(value)))
@@ -190,6 +202,66 @@ const mimeList = z.array(
 );
 export const settingsSchemas: Record<string, z.ZodType> = {
     APP_NAME: text(),
+    BRAND_ORGANIZATION_NAME: optionalText(),
+    BRAND_ORGANIZATION_URL: url,
+    BRAND_ACCENT_COLOR: color,
+    BRAND_COLOR_SUCCESS: oklchColor,
+    BRAND_COLOR_WARNING: oklchColor,
+    BRAND_COLOR_ERROR: oklchColor,
+    BRAND_COLOR_INFO: oklchColor,
+    BRAND_CORNER_STYLE: z.enum(['round', 'soft', 'square']),
+    BRAND_FONT: font,
+    BRAND_FONT_500: font,
+    BRAND_FONT_600: font,
+    BRAND_FONT_ITALIC: font,
+    BRAND_FONT_500_ITALIC: font,
+    BRAND_FONT_600_ITALIC: font,
+    BRAND_ONBOARDING: z
+        .array(
+            z.discriminatedUnion('type', [
+                z.object({
+                    type: z.literal('builtin'),
+                    step: z.enum(['encryption', 'groups']),
+                    emoji: optionalText(16),
+                    title: optionalText(80),
+                    text: optionalText(600),
+                    action: optionalText(40)
+                }),
+                z.object({
+                    type: z.literal('custom'),
+                    emoji: optionalText(16),
+                    title: text(80),
+                    text: text(600),
+                    action: optionalText(40)
+                })
+            ])
+        )
+        .max(8),
+    BRAND_LOGIN_NEWS: z
+        .array(
+            z.object({
+                date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+                title: text(80),
+                text: optionalText(280)
+            })
+        )
+        .max(10),
+    BRAND_LOGIN_BACKGROUNDS: z
+        .array(
+            z.object({
+                source: z.enum(['upload', 'builtin']),
+                file: z.string().min(1),
+                credit: optionalText(100),
+                link: url
+            })
+        )
+        .max(20),
+    BRAND_LOGO: svg,
+    BRAND_LOGO_HEIGHT: z.number().int().min(12).max(36).nullish(),
+    BRAND_FAVICON: svg,
+    LEGAL_IMPRINT_URL: link,
+    LEGAL_PRIVACY_URL: link,
+    LEGAL_TERMS_URL: link,
     APP_URL: url.refine((value) => !!value, 'admin.validation.required'),
     APP_ENV: text(50).regex(/^[a-zA-Z0-9_-]+$/),
     APP_TIMEZONE: text(),

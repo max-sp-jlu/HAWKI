@@ -11,5 +11,12 @@
         --corner-md:   16px;    /* --border-radius-normal */
         --corner-lg:   24px;    /* --border-radius-large */
         --corner-full: 9999px;
+        /* Buttons and select triggers. Pills by
+           default; a deployment's corner style squares them off, which --corner-full —
+           reserved for shapes that are circles by nature, like avatars — never does. */
+        --corner-control: var(--corner-full);
+        /* The same for low controls, toggle switches and sliders: about half a button's
+           height, so the button radius would still round them into pills. */
+        --corner-control-sm: var(--corner-full);
     }
 }

@@ -1,8 +1,9 @@
 <!--
   @component One onboarding step (heading, body, navigation), rendered for every
   step route of the nested router (see `RegistrationWelcome.svelte`). Which step
-  it shows comes from the route meta; the texts come as one bundle from
-  `ui.auth.register.welcome.<step>` (`title`, `body`, `action`).
+  it shows comes from the route meta; a built-in step's texts come from
+  `ui.auth.register.welcome.<step>` (`title`, `body`, `action`), a step an
+  administrator wrote carries its own.
 
   Back leads to the previous step; the action button leads to the next step or,
   on the last step, finishes the onboarding. The nested router keeps this
@@ -15,14 +16,16 @@
     import ArrowLeft01Icon from '$lib/components/ui/icons/iconset/ArrowLeft01Icon.svelte';
     import {useRouter, type RouteProps} from '$lib/components/ui/routing/index.js';
     import {useTranslator} from '$lib/app/hooks/useTranslator.svelte.js';
+    import {useAppName} from '$lib/app/hooks/useAppName.svelte.js';
     import type {WelcomeStepMeta} from './welcomeRoutes.js';
     import {useWelcomeFlow} from './welcomeFlow.js';
-    import {welcomeStepEmoji} from './welcomeSteps.js';
+    import {DEFAULT_STEP_EMOJI, welcomeStepEmoji} from './welcomeSteps.js';
 
     const {meta}: RouteProps<void, void, WelcomeStepMeta> = $props();
     const router = useRouter();
     const flow = useWelcomeFlow();
-    const {__, getTranslations} = useTranslator();
+    const {__} = useTranslator();
+    const appName = useAppName();
     let heading = $state<HTMLHeadingElement | null>(null);
     /** Measured height of the content; the outer box follows it so step changes resize smoothly. */
     let contentHeight = $state<number | undefined>(undefined);
@@ -33,11 +36,16 @@
         action: string;
     }
     const texts = $derived.by((): StepTexts => {
-        const bundle = getTranslations(`ui.auth.register.welcome.${meta.step}`);
-        const text = (key: keyof StepTexts) =>
-            bundle && typeof bundle === 'object' && typeof bundle[key] === 'string' ? bundle[key] : `Missing translation: ui.auth.register.welcome.${meta.step}.${key}`;
-        return {title: text('title'), body: text('body'), action: text('action')};
+        if (meta.custom) {
+            const {title, text, action} = meta.custom;
+            return {title, body: text, action: action ?? __('ui.auth.register.welcome.next')};
+        }
+        // An administrator's text replaces the translation it stands for; the rest stays translated.
+        const text = (key: keyof StepTexts, override: string | null | undefined) =>
+            override ?? __(`ui.auth.register.welcome.${meta.builtin}.${key}`, {appName});
+        return {title: text('title', meta.overrides?.title), body: text('body', meta.overrides?.text), action: text('action', meta.overrides?.action)};
     });
+    const emoji = $derived(meta.custom ? (meta.custom.emoji ?? DEFAULT_STEP_EMOJI) : (meta.overrides?.emoji ?? welcomeStepEmoji[meta.builtin!]));
 
     // The router keeps this component mounted across steps (same page, new
     // meta), so the heading is focused from an effect on the step, not on mount.
@@ -64,7 +72,7 @@
     </ol>
     {#key meta.step}
         <div class="auth-intro welcome-slide">
-            <span class="welcome-emoji" aria-hidden="true">{welcomeStepEmoji[meta.step]}</span>
+            <span class="welcome-emoji" aria-hidden="true">{emoji}</span>
             <h1 id="auth-title" tabindex="-1" bind:this={heading}>{texts.title}</h1>
             <p class="auth-copy">{texts.body}</p>
         </div>

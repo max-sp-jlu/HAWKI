@@ -7,7 +7,6 @@
         },
         "loading": "Wird geladen…",
         "auth": {
-            "logoLabel": "HAWKI",
             "errors": {
                 "auth_redirect_required": "Starte die Anmeldung über deinen Identitätsanbieter.",
                 "registration_policy_unavailable": "Die Registrierung ist vorübergehend nicht verfügbar, weil die Nutzungsbedingungen nicht geladen werden konnten. Bitte versuche es später erneut.",
@@ -19,8 +18,8 @@
             },
             "login": {
                 "title": "Anmelden",
-                "description": "Melde dich mit deinem HAWKI-Konto an.",
-                "mixedDescription": "Melde dich mit einem lokalen HAWKI-Konto oder über den Anmeldedienst deiner Organisation an.",
+                "description": "Melde dich mit deinem :appName-Konto an.",
+                "mixedDescription": "Melde dich mit einem lokalen :appName-Konto oder über den Anmeldedienst deiner Organisation an.",
                 "account": "Konto",
                 "password": "Passwort",
                 "submit": "Anmelden",
@@ -61,9 +60,10 @@
                 "backupTitle": "Sicherungscode aufbewahren",
                 "welcome": {
                     "back": "Zurück",
+                    "next": "Weiter",
                     "progress": "Schritt :current von :total",
                     "encryption": {
-                        "title": "Willkommen bei HAWKI",
+                        "title": "Willkommen bei :appName",
                         "body": "Ab jetzt werden deine Chats gespeichert, damit du jederzeit und von jedem Gerät darauf zurückkommen kannst. Alles, was du schreibst, wird verschlüsselt, bevor es deinen Browser verlässt. Niemand, auch nicht deine Hochschule, kann deine Gespräche lesen.",
                         "action": "Verstanden"
                     },
@@ -111,11 +111,10 @@
                 "confirmDescription": "Dadurch werden deine Chats, dein verschlüsselter Schlüsselbund, deine Passwortsicherung und zugehörige Profildaten dauerhaft gelöscht. Anschließend richtest du ein neues Passwort und einen neuen Sicherungscode ein. Dies kann nicht rückgängig gemacht werden.",
                 "confirm": "Profil zurücksetzen"
             },
-            "claim": "Deine Gespräche sind verschlüsselt. Der Schlüssel bleibt bei dir.",
             "signedInAs": "Angemeldet als :name",
-            "videoCredit": "Video von :name",
-            "videoToggle": "Video",
-            "videoToggleHint": "Hintergrundvideo ausschalten, um auf schwachen Geräten Energie zu sparen.",
+            "news": {
+                "title": "Neuigkeiten"
+            },
             "preferences": {
                 "switchToDark": "Dunkles Design verwenden",
                 "switchToLight": "Helles Design verwenden"
@@ -181,6 +180,13 @@
                 "toggleLabel": "Element umschalten"
             }
         },
+        "legal": {
+            "label": "Rechtliche Informationen",
+            "imprint": "Impressum",
+            "privacy": "Datenschutzerklärung",
+            "terms": "Nutzungsbedingungen",
+            "operatedBy": "Ein Angebot von :name"
+        },
         "profile": {
             "fallbackName": "Profil",
             "menuTitle": "Kontomenü",
@@ -195,7 +201,7 @@
             "confirm": "Bestätigen",
             "decline": "Ablehnen",
             "logoutWarningTitle": "Ablehnen und abmelden?",
-            "logoutWarningDescription": "Um HAWKI weiter zu nutzen, musst du diese Ankündigung akzeptieren. Wenn du ablehnst, wirst du abgemeldet.",
+            "logoutWarningDescription": "Um :appName weiter zu nutzen, musst du diese Ankündigung akzeptieren. Wenn du ablehnst, wirst du abgemeldet.",
             "pageTitle": "Ankündigungen",
             "empty": "Es gibt noch keine Ankündigungen für dich.",
             "back": "Zurück"
@@ -334,6 +340,9 @@
             "tier": "Staffel :number",
             "add_tier": "Staffel hinzufügen",
             "labels": {
+                "round": "Rund",
+                "soft": "Dezent",
+                "square": "Eckig",
                 "temperature": "Temperatur",
                 "top_p": "Top P",
                 "max_tokens": "Maximale Ausgabetoken",
@@ -478,6 +487,8 @@
         "reset_done": "Überschreibung entfernt. Der Umgebungswert gilt für neue Anfragen.",
         "settings_tabs": {
             "system": "System",
+            "branding": "Branding",
+            "legal": "Rechtliches",
             "authentication": "Authentifizierung",
             "features": "Funktionen",
             "performance": "Performance"
@@ -487,16 +498,40 @@
         "settings_reset": "Auf Umgebungsstandard zurücksetzen: :name",
         "settings_groups": {
             "base": {
-                "title": "Grundeinstellungen",
-                "description": "Anwendungsname und Branding."
+                "title": "Benennung",
+                "description": "Wie die Anwendung, ihr KI-Assistent und die betreibende Einrichtung heißen. Die Einrichtung wird auf der Anmeldeseite genannt."
+            },
+            "theme": {
+                "title": "Erscheinungsbild",
+                "description": "Markenfarbe und Eckenrundung. Schaltflächen, Links, Auswahlen und Fokusrahmen übernehmen Farbton und Sättigung der Markenfarbe; die Helligkeit legt die Oberfläche fest, damit Text im hellen und dunklen Modus lesbar bleibt."
+            },
+            "status": {
+                "title": "Statusfarben",
+                "description": "Farben für Bestätigungen, Warnungen, Fehler und Hinweise als OKLCH-Werte: oklch(Helligkeit % Chroma Farbton), zum Beispiel oklch(52% 0.21 25). Der Wert wird genau so verwendet, wie er eingegeben wird. Prüfen Sie daher, ob Text in dieser Farbe auf hellem und dunklem Hintergrund lesbar bleibt. Der Punkt zeigt die Farbe."
+            },
+            "font": {
+                "title": "Schrift",
+                "description": "Schriftdateien für die gesamte Oberfläche, eine je Schriftstärke: WOFF2, WOFF, TTF oder OTF mit jeweils bis zu 5 MB. WOFF2 lädt am schnellsten. Die Oberfläche nutzt drei Stärken: 400 für Text, 500 für Beschriftungen und Überschriften, 600 für fetten Text in Antworten und Tabellen. Eine variable Schrift im Feld „Normal“ liefert alle Schriftstärken allein. Laden Sie sonst zuerst den normalen Schnitt hoch; eine Stärke ohne Datei nutzt die nächstliegende, und Halbfettes verstärkt der Browser künstlich, wenn kein Schnitt dafür vorhanden ist. Kursive Schnitte sind optional und werden für Hervorhebungen in Antworten verwendet; ohne sie neigt der Browser die aufrechte Schrift. Eine variable Schrift im Feld „Kursiv“ liefert alle kursiven Stärken. Laden Sie nur Schriften hoch, für die Ihre Einrichtung eine Web-Lizenz besitzt."
+            },
+            "login": {
+                "title": "Anmeldeseite",
+                "description": "Was die große Fläche neben dem Anmeldeformular zeigt. Bei jedem Besuch erscheint der nächste Hintergrund, im hellen wie im dunklen Modus; ohne Hintergrund nur das Logo. Bis Sie die Liste ändern, enthält sie die HAWKI-Videos. Bilder: JPEG, PNG, WebP oder AVIF; Videos: MP4 oder WebM; jeweils bis zu 50 MB. Videos laufen stumm in Schleife. Laden Sie nur Material hoch, das Ihre Einrichtung veröffentlichen darf. Darüber kann eine kleine Karte Ihre drei neuesten Neuigkeiten zeigen."
+            },
+            "onboarding": {
+                "title": "Onboarding",
+                "description": "Die Willkommensschritte, die neue Nutzende nach der ersten Anmeldung sehen. Bearbeiten, ordnen oder entfernen Sie die HAWKI-Schritte und fügen Sie eigene hinzu, etwa Nutzungsregeln oder wo es Hilfe gibt. Was Sie schreiben, erscheint so, wie Sie es schreiben, in einer Sprache; leere Felder eines HAWKI-Schritts behalten den übersetzten Standardtext."
+            },
+            "logo": {
+                "title": "Logo",
+                "description": "SVG-Dateien, die anstelle des HAWKI-Schriftzugs und als Symbol im Browser-Tab erscheinen. Das Logo wird im hellen wie im dunklen Modus in der Markenfarbe dargestellt; verwendet wird nur seine Form, nicht seine eigenen Farben. Die Dateien müssen statische Zeichnungen bis 256 KB sein: ohne Skripte, externe Verweise oder Text als Schrift. Wandeln Sie Text vor dem Export in Pfade um."
             },
             "system": {
                 "title": "Systemkonfiguration",
                 "description": "Basis-URL, Umgebung, Zeitzone und Standardsprache."
             },
             "links": {
-                "title": "Links",
-                "description": "Öffentliche Barrierefreiheitserklärung. Ein leerer Wert blendet den Link aus."
+                "title": "Rechtliche Seiten",
+                "description": "Erscheinen auf der Anmeldeseite und im Kontomenü. Geben Sie eine Adresse an oder einen Pfad auf diesem Server wie /dataprotection. Ein leerer Wert blendet den jeweiligen Link aus."
             },
             "passkey": {
                 "title": "Passkey-Einstellungen",
@@ -512,7 +547,7 @@
             },
             "features": {
                 "title": "KI-Funktionen",
-                "description": "KI-Erwähnungsname und Prüfung der Tool-Verfügbarkeit."
+                "description": "Prüfung der Tool-Verfügbarkeit."
             },
             "api": {
                 "title": "API-Konfiguration",
@@ -533,6 +568,29 @@
         },
         "settings_labels": {
             "APP_NAME": "Anwendungsname",
+            "BRAND_ORGANIZATION_NAME": "Name der Einrichtung",
+            "BRAND_ORGANIZATION_URL": "Website der Einrichtung",
+            "BRAND_ACCENT_COLOR": "Markenfarbe",
+            "BRAND_COLOR_SUCCESS": "Erfolg",
+            "BRAND_COLOR_WARNING": "Warnung",
+            "BRAND_COLOR_ERROR": "Fehler",
+            "BRAND_COLOR_INFO": "Information",
+            "BRAND_CORNER_STYLE": "Eckenrundung",
+            "BRAND_FONT": "Schrift – Normal (400)",
+            "BRAND_FONT_500": "Mittel (500)",
+            "BRAND_FONT_600": "Halbfett (600)",
+            "BRAND_FONT_ITALIC": "Kursiv (400)",
+            "BRAND_FONT_500_ITALIC": "Mittel kursiv (500)",
+            "BRAND_FONT_600_ITALIC": "Halbfett kursiv (600)",
+            "BRAND_ONBOARDING": "Willkommensschritte",
+            "BRAND_LOGIN_NEWS": "Neuigkeiten",
+            "BRAND_LOGIN_BACKGROUNDS": "Hintergründe",
+            "BRAND_LOGO": "Logo",
+            "BRAND_LOGO_HEIGHT": "Logohöhe",
+            "BRAND_FAVICON": "Symbol im Browser-Tab",
+            "LEGAL_IMPRINT_URL": "Impressum",
+            "LEGAL_PRIVACY_URL": "Datenschutzerklärung",
+            "LEGAL_TERMS_URL": "Nutzungsbedingungen",
             "APP_URL": "Basis-URL",
             "APP_ENV": "Umgebung",
             "APP_TIMEZONE": "Standardzeitzone",
@@ -542,7 +600,7 @@
             "SESSION_EXPIRE_ON_CLOSE": "Sitzung beim Schließen des Browsers beenden",
             "SESSION_ENCRYPT": "Sitzungsdaten verschlüsseln",
             "AI_MENTION_HANDLE": "KI-Erwähnungsname, ohne @",
-            "ACCESSIBILITY_STATEMENT_URL": "URL der Barrierefreiheitserklärung",
+            "ACCESSIBILITY_STATEMENT_URL": "Barrierefreiheitserklärung",
             "APP_SECURITY_PASSKEY_ALLOW_PASTE": "Einfügen des Passkeys erlauben",
             "APP_SECURITY_PASSKEY_AUTO_GENERATE": "Passkeys automatisch erzeugen",
             "APP_SECURITY_PASSKEY_CHAR_LIMITATION": "Passkey-Zeichen einschränken",
@@ -559,7 +617,13 @@
             "REMOVE_FILES_AFTER_MONTHS": "Dateiaufbewahrung in Monaten",
             "CHECK_TOOL_STATUS": "Tool-Verfügbarkeit prüfen"
         },
-        "settings_hint": "Umgebungswerte gelten als Standard. Nur abweichende Werte werden gespeichert. Nach dem Speichern die App neu laden.",
+        "settings_hint": "Umgebungswerte sind die Standardwerte; nur geänderte Werte werden gespeichert. Markenfarbe, Eckenrundung und Logo sehen Sie beim Bearbeiten direkt auf dieser Seite. Einige andere Änderungen erscheinen erst nach dem Neuladen der Anwendung.",
+        "settings_unsaved": "Ungespeicherte Änderungen: :count",
+        "settings_upload_svg": "SVG hochladen",
+        "settings_replace_svg": "Ersetzen",
+        "settings_pixels": ":value px",
+        "settings_pick_color": "Farbe auswählen",
+        "settings_use_default": "Standard verwenden",
         "environment_hint": "Schreibgeschützte Informationen zur Bereitstellung. Geheime Werte sind ausgeblendet.",
         "action_confirmation": "Aktion ausführen? Bestehende Konfiguration oder der Systemzustand können sich ändern.",
         "action_done": "Aktion abgeschlossen. Eingereihte Aufgaben laufen, sobald ein Worker verfügbar ist.",
@@ -781,6 +845,54 @@
             "database": "Datenbanküberschreibung",
             "environment": "Umgebung / Standard",
             "deployment": "Bereitstellung"
+        },
+        "onboarding": {
+            "entry": "Schritt :number",
+            "builtin": "HAWKI-Schritt: leere Felder zeigen den übersetzten Standardtext",
+            "emoji": "Emoji",
+            "title": "Titel",
+            "text": "Text",
+            "action": "Beschriftung des Knopfs (optional, sonst „Weiter“)",
+            "up": "Nach oben",
+            "down": "Nach unten",
+            "remove": "Entfernen",
+            "add": "Schritt hinzufügen",
+            "empty": "Keine Willkommensschritte: Neue Nutzende richten direkt ihr Passwort ein.",
+            "passkey_last": "Danach folgt immer die Einrichtung des Passworts.",
+            "invalid": "Prüfen Sie die Willkommensschritte: Jeder eigene braucht einen Titel mit bis zu 80 und einen Text mit bis zu 600 Zeichen; jeder HAWKI-Schritt darf einmal vorkommen."
+        },
+        "news": {
+            "entry": "Neuigkeit :number",
+            "date": "Datum",
+            "title": "Titel",
+            "text": "Kurztext (optional)",
+            "remove": "Entfernen",
+            "add": "Neuigkeit hinzufügen",
+            "empty": "Keine Neuigkeiten: Die Anmeldeseite zeigt keine an.",
+            "invalid": "Prüfen Sie die Neuigkeiten: Jede braucht ein Datum und einen Titel mit bis zu 80 Zeichen; ein Text darf bis zu 280 Zeichen haben."
+        },
+        "media": {
+            "invalid": "Verwenden Sie ein Bild (JPEG, PNG, WebP, AVIF) oder ein Video (MP4, WebM) mit bis zu 50 MB.",
+            "upload_failed": "Die Datei konnte nicht hochgeladen werden. Verwenden Sie ein Bild oder Video mit bis zu 50 MB und versuchen Sie es erneut.",
+            "invalid_entry": "Prüfen Sie die Hintergründe: Jeder braucht eine vorhandene Datei, und, falls angegeben, einen Nachweis mit bis zu 100 Zeichen und einen https-Link.",
+            "entry": "Hintergrund :number",
+            "credit": "Nachweis, z. B. Fotograf*in",
+            "link": "Link zum Nachweis (https://…)",
+            "remove": "Entfernen",
+            "add": "Bild oder Video hinzufügen",
+            "empty": "Keine Hintergründe: Die Anmeldeseite zeigt nur das Logo."
+        },
+        "fonts": {
+            "invalid": "Verwenden Sie eine Schriftdatei im Format WOFF2, WOFF, TTF oder OTF mit bis zu 5 MB.",
+            "upload_failed": "Die Schrift konnte nicht hochgeladen werden. Verwenden Sie eine Datei im Format WOFF2, WOFF, TTF oder OTF mit bis zu 5 MB und versuchen Sie es erneut.",
+            "upload": "Schrift hochladen",
+            "replace": "Ersetzen",
+            "sample": "Falsches Üben von Xylophonmusik 0123456789",
+            "needs_regular": "Laden Sie zuerst die normale Schrift (400) hoch.",
+            "needs_italic": "Laden Sie zuerst die kursive Schrift (400) hoch.",
+            "covered_italic": "Wird von der variablen kursiven Schrift abgedeckt.",
+            "covered": "Wird von der variablen Schrift im Feld „Normal“ abgedeckt.",
+            "variable": "Variable Schrift: liefert alle Schriftstärken"
         },
         "icons": {
             "light": "Hell",

@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\V1\AiProviderController;
 use App\Http\Controllers\Api\V1\AiToolController;
 use App\Http\Controllers\Api\V1\AnnouncementController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\BrandFontController;
+use App\Http\Controllers\Api\V1\BrandMediaController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Http\Controllers\Api\V1\ConnectionController;
 use App\Http\Controllers\Api\V1\ExtAppController;
@@ -73,6 +75,13 @@ Route::middleware([
     });
 });
 
+Route::get(Server::BASE_URL_PREFIX . '/brand-fonts/{file}', BrandFontController::class)
+    ->where('file', '[a-f0-9]{64}(\\.var)?\\.(woff2|woff|ttf|otf)')
+    ->name('api.brand-fonts.show');
+Route::get(Server::BASE_URL_PREFIX . '/brand-media/{file}', BrandMediaController::class)
+    ->where('file', '[a-f0-9]{64}\\.(jpg|png|webp|avif|mp4|webm)')
+    ->name('api.brand-media.show');
+
 JsonApiRoute::server('v1')
     ->prefix(Server::BASE_URL_PREFIX)
     ->middleware(
@@ -125,7 +134,11 @@ JsonApiRoute::server('v1')
                 });
 
             $server->resource('admin-settings', Admin\SettingController::class)
-                ->only('index', 'update', 'destroy');
+                ->only('index', 'update', 'destroy')
+                ->actions(function (ActionRegistrar $actions) {
+                    $actions->post('actions/font-upload', 'uploadFont');
+                    $actions->post('actions/media-upload', 'uploadMedia');
+                });
 
             $server->resource('admin-usage', Admin\UsageController::class)
                 ->only('index');

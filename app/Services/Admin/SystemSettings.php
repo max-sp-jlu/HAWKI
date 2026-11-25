@@ -5,14 +5,56 @@ declare(strict_types=1);
 namespace App\Services\Admin;
 
 use App\Services\Config\EnvironmentConfigProxy;
+use App\Services\Frontend\View\BrandTheme;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class SystemSettings
 {
+    /** An absolute HTTP(S) URL or a path on this host; protocol-relative URLs are rejected. */
+    private const LINK = 'nullable|string|max:2000|regex:~^(?:https?:/)?/[^/\s"\'<>][^\s"\'<>]*$~';
+
+    /** Settings whose value is a CSS OKLCH color. */
+    public const OKLCH = ['BRAND_COLOR_SUCCESS', 'BRAND_COLOR_WARNING', 'BRAND_COLOR_ERROR', 'BRAND_COLOR_INFO'];
+
+    /** Settings whose value names an uploaded font file. */
+    public const FONT = ['BRAND_FONT', 'BRAND_FONT_500', 'BRAND_FONT_600', 'BRAND_FONT_ITALIC', 'BRAND_FONT_500_ITALIC', 'BRAND_FONT_600_ITALIC'];
+
+    /** Settings whose value lists uploaded sign-in backgrounds. */
+    public const MEDIA = ['BRAND_LOGIN_BACKGROUNDS'];
+
+    /** Settings whose value is the markup of an uploaded SVG file. */
+    public const SVG = ['BRAND_LOGO', 'BRAND_FAVICON'];
+
+    private const COLOR = 'nullable|string|regex:/^#[0-9a-fA-F]{6}$/';
+
     public const DEFINITIONS = [
         'APP_NAME' => ['app.name', 'string', 'required|string|max:255'],
+        'BRAND_ORGANIZATION_NAME' => ['hawki.branding.organization_name', 'string', 'nullable|string|max:255'],
+        'BRAND_ORGANIZATION_URL' => ['hawki.branding.organization_url', 'string', 'nullable|url:http,https|max:2000'],
+        'BRAND_ACCENT_COLOR' => ['hawki.branding.accent_color', 'string', self::COLOR],
+        'BRAND_COLOR_SUCCESS' => ['hawki.branding.status_colors.success', 'string', 'nullable|string|max:60'],
+        'BRAND_COLOR_WARNING' => ['hawki.branding.status_colors.warning', 'string', 'nullable|string|max:60'],
+        'BRAND_COLOR_ERROR' => ['hawki.branding.status_colors.error', 'string', 'nullable|string|max:60'],
+        'BRAND_COLOR_INFO' => ['hawki.branding.status_colors.info', 'string', 'nullable|string|max:60'],
+        'BRAND_CORNER_STYLE' => ['hawki.branding.corner_style', 'string', 'required|in:round,soft,square'],
+        'BRAND_FONT' => ['hawki.branding.font', 'string', 'nullable|string|max:80'],
+        'BRAND_FONT_500' => ['hawki.branding.font_500', 'string', 'nullable|string|max:80'],
+        'BRAND_FONT_600' => ['hawki.branding.font_600', 'string', 'nullable|string|max:80'],
+        'BRAND_FONT_ITALIC' => ['hawki.branding.font_italic', 'string', 'nullable|string|max:80'],
+        'BRAND_FONT_500_ITALIC' => ['hawki.branding.font_500_italic', 'string', 'nullable|string|max:80'],
+        'BRAND_FONT_600_ITALIC' => ['hawki.branding.font_600_italic', 'string', 'nullable|string|max:80'],
+        'BRAND_LOGIN_BACKGROUNDS' => ['hawki.branding.login_backgrounds', 'json', 'present|array|max:20'],
+        'BRAND_LOGIN_NEWS' => ['hawki.branding.login_news', 'json', 'present|array|max:' . LoginNews::MAX_ENTRIES],
+        'BRAND_ONBOARDING' => ['hawki.branding.onboarding', 'json', 'present|array|max:' . Onboarding::MAX_STEPS],
+        'BRAND_LOGO' => ['hawki.branding.logo', 'string', 'nullable|string'],
+        'BRAND_LOGO_HEIGHT' => ['hawki.branding.logo_height', 'number', 'nullable|integer|min:12|max:36'],
+        'BRAND_FAVICON' => ['hawki.branding.favicon', 'string', 'nullable|string'],
+        'LEGAL_IMPRINT_URL' => ['hawki.legal.imprint_url', 'string', self::LINK],
+        'LEGAL_PRIVACY_URL' => ['hawki.legal.privacy_url', 'string', self::LINK],
+        'LEGAL_TERMS_URL' => ['hawki.legal.terms_url', 'string', self::LINK],
         'APP_URL' => ['app.url', 'string', 'required|url:http,https|max:2000'],
         'APP_ENV' => ['app.env', 'string', 'required|alpha_dash:ascii|max:50'],
         'APP_TIMEZONE' => ['app.timezone', 'string', 'required|timezone:all_with_bc'],
@@ -110,7 +152,39 @@ class SystemSettings
         }
 
         $value = Validator::make(['value' => $value], $rules)->validate()['value'];
+
+        // Checked strictly before normalizing, which would quietly drop invalid entries.
+        if (\in_array($key, self::MEDIA, true)) {
+            BrandMedia::backgrounds($value, strict: true);
+        }
+
+        if ('BRAND_LOGIN_NEWS' === $key) {
+            LoginNews::entries($value, strict: true);
+        }
+
+        if ('BRAND_ONBOARDING' === $key) {
+            Onboarding::steps($value, strict: true);
+        }
+
         $value = $this->normalize($key, $value);
+
+        if (\in_array($key, self::OKLCH, true) && null !== $value) {
+            // Stored in one canonical spelling; it is written into every page's stylesheet.
+            $value = BrandTheme::oklch($value) ?? throw ValidationException::withMessages(['value' => __('admin.errors.invalid_value')]);
+        }
+
+        if (\in_array($key, self::FONT, true) && null !== $value && !app(BrandFonts::class)->exists($value)) {
+            throw ValidationException::withMessages(['value' => __('admin.fonts.invalid')]);
+        }
+
+        if (\in_array($key, self::SVG, true) && null !== $value) {
+            try {
+                // Stored sanitized: the markup is later embedded in pages every visitor loads.
+                $value = app(ProviderIconService::class)->validateSvg($value);
+            } catch (ValidationException $exception) {
+                throw ValidationException::withMessages(['value' => $exception->errors()['icon']]);
+            }
+        }
 
         if ($this->default($key) === $value) {
             $this->reset($key);
@@ -124,6 +198,7 @@ class SystemSettings
             ['value', 'updated_by', 'updated_at'],
         );
         $this->apply();
+        $this->pruneFiles($key);
     }
 
     public function reset(string $key): void
@@ -131,11 +206,31 @@ class SystemSettings
         abort_unless(isset(self::DEFINITIONS[$key]), 404);
         DB::table('admin_settings')->where('key', $key)->delete();
         $this->apply();
+        $this->pruneFiles($key);
+    }
+
+    /** A changed font or background setting can leave its previous file unused. */
+    private function pruneFiles(string $key): void
+    {
+        if (\in_array($key, self::FONT, true)) {
+            app(BrandFonts::class)->prune();
+        }
+
+        if (\in_array($key, self::MEDIA, true)) {
+            app(BrandMedia::class)->prune();
+        }
     }
 
     public function environment(): array
     {
-        $rows = $this->rows();
+        $rows = array_map(
+            static fn (array $row) => match (true) {
+                \in_array($row['key'], self::SVG, true) => ['value' => null === $row['value'] ? '[not set]' : '[set]'] + $row,
+                \in_array($row['key'], [...self::MEDIA, 'BRAND_LOGIN_NEWS', 'BRAND_ONBOARDING'], true) => ['value' => \count((array) $row['value']) . ' entries'] + $row,
+                default => $row,
+            },
+            $this->rows(),
+        );
 
         foreach (['APP_DEBUG' => 'app.debug', 'DB_CONNECTION' => 'database.default', 'QUEUE_CONNECTION' => 'queue.default', 'CACHE_STORE' => 'cache.default', 'SESSION_DRIVER' => 'session.driver', 'MAIL_MAILER' => 'mail.default'] as $key => $path) {
             $rows[] = ['id' => $key, 'key' => $key, 'value' => config($path), 'source' => 'deployment'];
@@ -180,9 +275,23 @@ class SystemSettings
             return ltrim((string) $value, '@');
         }
 
+        // The database may reorder the keys of a stored JSON object; one canonical shape keeps comparisons exact.
+        if (\in_array($key, self::MEDIA, true)) {
+            return BrandMedia::backgrounds($value);
+        }
+
+        if ('BRAND_LOGIN_NEWS' === $key) {
+            return LoginNews::entries($value);
+        }
+
+        if ('BRAND_ONBOARDING' === $key) {
+            return Onboarding::steps($value);
+        }
+
         return match (self::DEFINITIONS[$key][1]) {
             'boolean' => filter_var($value, \FILTER_VALIDATE_BOOLEAN),
-            'number' => (int) $value,
+            // An optional number keeps "not set" apart from zero.
+            'number' => null === $value && str_starts_with(self::DEFINITIONS[$key][2], 'nullable') ? null : (int) $value,
             'string' => '' === $value ? null : $value,
             default => $value,
         };
@@ -197,6 +306,7 @@ class SystemSettings
 
         $values = match ($key) {
             'AUTHENTICATION_METHOD' => ['LDAP', 'OIDC', 'Shibboleth'],
+            'BRAND_CORNER_STYLE' => ['round', 'soft', 'square'],
             'APP_TIMEZONE' => \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC),
             default => [],
         };
